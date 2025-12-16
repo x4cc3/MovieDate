@@ -397,17 +397,6 @@ btnAccept.addEventListener('click', () => {
         calendarBtn.onclick = () => window.open(calendarUrl, '_blank');
     }
 
-    // Generate QR code
-    const ticketId = document.getElementById('ticket-id-val').innerText;
-    const qrData = `Movie Night | ${genre} | ${dates} | ${time} | ID:${ticketId}`;
-    const qrImg = document.getElementById('ticket-qr');
-    const barcodeFallback = document.getElementById('barcode-fallback');
-    if (qrImg) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrData)}&bgcolor=0f0720&color=ffffff`;
-        qrImg.style.display = 'block';
-        if (barcodeFallback) barcodeFallback.style.display = 'none';
-    }
-
     acceptanceCard.classList.remove('hidden');
 
     // Trigger confetti!
@@ -477,25 +466,6 @@ let pickupLines = [
 const pickupEl = document.getElementById('pickup-line');
 let usedLines = new Set();
 
-// Typing animation function
-function typeText(element, text, speed = 40) {
-    return new Promise(resolve => {
-        element.classList.add('typing');
-        element.innerText = '';
-        let i = 0;
-        const interval = setInterval(() => {
-            if (i < text.length) {
-                element.innerText += text.charAt(i);
-                i++;
-            } else {
-                clearInterval(interval);
-                element.classList.remove('typing');
-                resolve();
-            }
-        }, speed);
-    });
-}
-
 function setRandomLine() {
     if (!pickupEl) return;
     // reset when all are used
@@ -507,7 +477,7 @@ function setRandomLine() {
         line = pickupLines[Math.floor(Math.random() * pickupLines.length)];
     } while (usedLines.has(line));
     usedLines.add(line);
-    typeText(pickupEl, line, 35);
+    pickupEl.textContent = line;
 }
 
 // Set initial line after JSON loads

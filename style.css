@@ -791,37 +791,15 @@ body.clean-view::after {
     font-style: italic;
     text-align: center;
     background: linear-gradient(180deg, rgba(168, 85, 247, 0.05) 0%, transparent 100%);
-    padding: 24px 16px;
+    padding: 24px 20px;
     border: none;
     border-top: 1px solid var(--border-glow);
     border-bottom: 1px solid var(--border-glow);
     border-radius: 12px;
     box-shadow: var(--glow-subtle);
     font-weight: 300;
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.intro-text.typing::after {
-    content: '|';
-    animation: blink-cursor 0.8s step-end infinite;
-    color: var(--accent-primary);
-    margin-left: 2px;
-}
-
-@keyframes blink-cursor {
-
-    0%,
-    50% {
-        opacity: 1;
-    }
-
-    51%,
-    100% {
-        opacity: 0;
-    }
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 @keyframes fadeInGlow {
