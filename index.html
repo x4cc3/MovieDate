@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Invite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sora:wght@300;500;700&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Skip to Main Content (Accessibility) -->
+    <a href="#wizard-container" id="skip-link" class="skip-link">Skip to main content</a>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p>Loading cosmic experience...</p>
+        </div>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <!-- Step Counter -->
+    <div class="step-indicator" id="step-indicator" aria-live="assertive" aria-atomic="true">STEP 1 / 6</div>
+
+    <!-- Background Canvas -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- Main Wizard Container -->
+    <main id="wizard-container" class="wizard-container" tabindex="-1" role="form"
+        aria-label="Movie night invitation form">
+        <form id="invite-form" autocomplete="off" onsubmit="return false;">
+
+            <!-- Step 1: Intro -->
+            <div class="step active" data-step="1">
+                <h2>Hey you...</h2>
+                <p class="subtitle">Before we get to the details...</p>
+                <div class="field-group">
+                    <p class="intro-text" id="pickup-line">Are you a magician? Because whenever I look at you, everyone
+                        else disappears.</p>
+                    <p id="error-banner" class="error-banner hidden" role="alert">Fill the required bits before we warp
+                        ahead.</p>
+                </div>
+                <div class="nav-buttons single-right">
+                    <button type="button" class="btn-next" data-next>Continue</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Genre (Galaxy Center) -->
+            <div class="step" data-step="2">
+                <h2>Pick a genre</h2>
+                <div class="field-group">
+                    <select id="genre-select" class="input-control" required>
+                        <option value="" disabled selected>Select one...</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Action">Action</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Anime">Anime</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="genre-other" class="input-control hidden" placeholder="Type genre here..."
+                        aria-label="Type custom genre">
+                </div>
+                <div class="nav-buttons single-right">
+                    <button type="button" class="btn-next" data-next>Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Snacks (Floating Cubes Sector) -->
+            <div class="step" data-step="3">
+                <h2>Snacks?</h2>
+                <p class="subtitle">Comma separated if multiple.</p>
+                <div class="field-group">
+                    <input type="text" id="snacks" class="input-control" placeholder="Popcorn, soda, candy...">
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn-prev" data-prev>Back</button>
+                    <button type="button" class="btn-next" data-next>Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Dates (Giant Ring Sector) -->
+            <div class="step" data-step="4">
+                <h2>Add a date</h2>
+                <div class="field-group" id="date-container">
+                    <div class="date-row">
+                        <input type="date" class="input-control date-input" required>
+                        <button type="button" class="btn-icon remove-date" aria-label="Remove date">&times;</button>
+                    </div>
+                </div>
+                <button type="button" id="add-date-btn" class="btn-text">+ Add another date</button>
+                <div class="nav-buttons">
+                    <button type="button" class="btn-prev" data-prev>Back</button>
+                    <button type="button" class="btn-next" data-next>Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Time (Crystals Sector) -->
+            <div class="step" data-step="5">
+                <h2>Time works?</h2>
+                <div class="field-group">
+                    <div class="quick-picks">
+                        <button type="button" class="chip" data-time="19:00">7:00 PM</button>
+                        <button type="button" class="chip" data-time="20:00">8:00 PM</button>
+                        <button type="button" class="chip" data-time="21:00">9:00 PM</button>
+                    </div>
+                    <input type="time" id="time-input" class="input-control" required>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn-prev" data-prev>Back</button>
+                    <button type="button" class="btn-next" data-next>Next</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Extra (Zoomed Out) -->
+            <div class="step" data-step="6">
+                <h2>Anything else?</h2>
+                <div class="field-group">
+                    <textarea id="extra-notes" class="input-control" maxlength="400" rows="4"
+                        placeholder="Parking info, allergies, etc."></textarea>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn-prev" data-prev>Back</button>
+                    <button type="button" class="btn-primary" id="btn-review">Review</button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Review Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true">
+            <h2 id="modal-title">Looks good?</h2>
+            <div id="review-summary" class="review-content"></div>
+            <div class="modal-actions">
+                <button type="button" id="btn-edit" class="btn-text">Edit</button>
+                <button type="button" id="btn-accept" class="btn-primary">Accept Invite</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acceptance Ticket (Centered & Clean) -->
+    <div id="acceptance-card" class="acceptance-card hidden" aria-hidden="true">
+        <div class="ticket-container">
+            <div class="ticket">
+                <div class="ticket-left">
+                    <div class="ticket-header">
+                        <span class="admit-one">ADMIT ONE</span>
+                        <span class="ticket-title">MOVIE NIGHT</span>
+                    </div>
+                    <div class="ticket-body">
+                        <div class="ticket-info">
+                            <span class="label">GENRE</span>
+                            <span class="value" id="ticket-genre">Sci-Fi</span>
+                        </div>
+                        <div class="ticket-info">
+                            <span class="label">TIME</span>
+                            <span class="value" id="ticket-time">20:00</span>
+                        </div>
+                        <div class="ticket-info full-width">
+                            <span class="label">DATES</span>
+                            <span class="value" id="ticket-dates">Oct 24, 2025</span>
+                        </div>
+                        <div class="ticket-info full-width">
+                            <span class="label">SNACKS</span>
+                            <span class="value" id="ticket-snacks">Popcorn</span>
+                        </div>
+                    </div>
+                    <div class="ticket-footer">
+                        <span class="ticket-id">ID: <span id="ticket-id-val">837492</span></span>
+                        <span class="ticket-signature">ACCEPTED</span>
+                    </div>
+                </div>
+                <div class="ticket-right">
+                    <img id="ticket-qr" class="ticket-qr" src="" alt="QR Code" style="display:none;">
+                    <div class="barcode" id="barcode-fallback"></div>
+                    <div class="ticket-actions">
+                        <button type="button" id="btn-copy" class="btn-ticket-action" title="Copy Details">Copy</button>
+                        <button type="button" id="btn-download" class="btn-ticket-action"
+                            title="Download Ticket">Save</button>
+                        <button type="button" id="btn-calendar" class="btn-ticket-action"
+                            title="Add to Calendar">Cal</button>
+                        <button type="button" id="btn-clean-view" class="btn-ticket-action"
+                            title="Clean View">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="btn-reset" class="btn-text btn-reset">Start Over</button>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./vendor/three.module.js"
+            }
+        }
+    </script>
+    <script type="module" src="form.js"></script>
+</body>
+
+</html>
