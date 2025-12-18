@@ -41,7 +41,7 @@ function saveFormData() {
         genre: genreSelect.value,
         genreOther: genreOther.value,
         snacks: document.getElementById('snacks').value,
-        dates: Array.from(document.querySelectorAll('.date-input')).map(i => i.value),
+        dates: Array.from(selectedDates).sort(),
         time: timeInput.value,
         notes: document.getElementById('extra-notes').value
     };
@@ -69,21 +69,9 @@ function restoreFormData() {
 
         // Restore dates
         if (data.dates && data.dates.length > 0) {
-            const dateInputs = document.querySelectorAll('.date-input');
-            data.dates.forEach((dateVal, index) => {
-                if (index === 0 && dateInputs[0]) {
-                    dateInputs[0].value = dateVal;
-                } else if (dateVal) {
-                    // Add new date row
-                    const div = document.createElement('div');
-                    div.className = 'date-row';
-                    div.innerHTML = `
-                        <input type="date" class="input-control date-input" required value="${dateVal}">
-                        <button type="button" class="btn-icon remove-date" aria-label="Remove date">&times;</button>
-                    `;
-                    dateContainer.appendChild(div);
-                }
-            });
+            selectedDates = new Set(data.dates.filter(Boolean));
+            renderSelectedDates();
+            syncDateChipsState();
         }
 
         // Restore time
@@ -131,32 +119,131 @@ genreSelect.addEventListener('change', (e) => {
 
 genreOther.addEventListener('input', saveFormData);
 
-const dateContainer = document.getElementById('date-container');
-const addDateBtn = document.getElementById('add-date-btn');
+// --- Date Picking (simplified) ---
 
-addDateBtn.addEventListener('click', () => {
-    const div = document.createElement('div');
-    div.className = 'date-row';
-    div.innerHTML = `
-        <input type="date" class="input-control date-input" required>
-        <button type="button" class="btn-icon remove-date" aria-label="Remove date">&times;</button>
-    `;
-    dateContainer.appendChild(div);
-    // Add save listener to new input
-    div.querySelector('.date-input').addEventListener('change', saveFormData);
-});
+const datePicks = document.getElementById('date-picks');
+const selectedDatesEl = document.getElementById('selected-dates');
+const customDateInput = document.getElementById('custom-date-input');
+const addCustomDateBtn = document.getElementById('add-custom-date');
 
-dateContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('remove-date')) {
-        e.target.closest('.date-row').remove();
-        saveFormData();
+let selectedDates = new Set();
+
+function pad2(n) {
+    return String(n).padStart(2, '0');
+}
+
+function formatDateIso(d) {
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function formatDateNice(iso) {
+    const d = new Date(`${iso}T00:00:00`);
+    return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function buildQuickDatePicks() {
+    if (!datePicks) return;
+    datePicks.innerHTML = '';
+
+    // Next 7 days (including today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const iso = formatDateIso(d);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'date-chip';
+        btn.dataset.date = iso;
+        btn.setAttribute('aria-pressed', 'false');
+        btn.textContent = i === 0 ? `Today (${formatDateNice(iso)})` : formatDateNice(iso);
+
+        btn.addEventListener('click', () => {
+            toggleDate(iso);
+        });
+
+        datePicks.appendChild(btn);
     }
+}
+
+function toggleDate(iso) {
+    if (!iso) return;
+
+    if (selectedDates.has(iso)) {
+        selectedDates.delete(iso);
+    } else {
+        selectedDates.add(iso);
+    }
+
+    renderSelectedDates();
+    syncDateChipsState();
+    saveFormData();
+}
+
+function removeDate(iso) {
+    selectedDates.delete(iso);
+    renderSelectedDates();
+    syncDateChipsState();
+    saveFormData();
+}
+
+function syncDateChipsState() {
+    datePicks?.querySelectorAll('.date-chip').forEach((chip) => {
+        const on = selectedDates.has(chip.dataset.date);
+        chip.classList.toggle('selected', on);
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+}
+
+function renderSelectedDates() {
+    if (!selectedDatesEl) return;
+
+    const dates = Array.from(selectedDates).sort();
+
+    if (dates.length === 0) {
+        selectedDatesEl.innerHTML = '<span class="selected-dates-empty">No dates selected yet.</span>';
+        return;
+    }
+
+    selectedDatesEl.innerHTML = dates
+        .map((iso) => {
+            const label = formatDateNice(iso);
+            return `
+                <span class="selected-date-pill">
+                    <span class="selected-date-text">${label}</span>
+                    <button type="button" class="remove-selected-date" data-date="${iso}" aria-label="Remove ${label}">&times;</button>
+                </span>
+            `;
+        })
+        .join('');
+}
+
+selectedDatesEl?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.remove-selected-date');
+    if (!btn) return;
+    removeDate(btn.dataset.date);
 });
 
-// Save on existing date inputs
-document.querySelectorAll('.date-input').forEach(input => {
-    input.addEventListener('change', saveFormData);
+addCustomDateBtn?.addEventListener('click', () => {
+    const iso = customDateInput?.value;
+    if (!iso) return;
+    toggleDate(iso);
+    customDateInput.value = '';
 });
+
+customDateInput?.addEventListener('change', () => {
+    // If users pick a date from the native picker, add it immediately.
+    const iso = customDateInput.value;
+    if (!iso) return;
+    toggleDate(iso);
+    customDateInput.value = '';
+});
+
+buildQuickDatePicks();
+renderSelectedDates();
 
 const timeInput = document.getElementById('time-input');
 timeInput.addEventListener('change', saveFormData);
@@ -225,6 +312,20 @@ function changeStep(stepIndex) {
 function validateStep(step) {
     const stepEl = document.querySelector(`.step[data-step="${step}"]`);
     let valid = true;
+
+    // Special-case dates step: require at least one selected date.
+    if (step === 4) {
+        const dateError = document.getElementById('date-error');
+        const ok = selectedDates.size > 0;
+        if (!ok) valid = false;
+
+        if (dateError) {
+            dateError.classList.toggle('hidden', ok);
+        }
+
+        return valid;
+    }
+
     stepEl.querySelectorAll('[required]').forEach(el => {
         if (!el.value) {
             el.classList.add('input-error');
@@ -353,7 +454,7 @@ btnReview.addEventListener('click', () => {
     // Gather data
     const genre = genreSelect.value === 'Other' ? genreOther.value : genreSelect.value;
     const snacks = document.getElementById('snacks').value || "None";
-    const dates = Array.from(document.querySelectorAll('.date-input')).map(i => i.value).filter(Boolean).join(', ');
+    const dates = Array.from(selectedDates).sort().join(', ');
     const time = timeInput.value;
     const notes = document.getElementById('extra-notes').value || "No notes";
 
@@ -381,7 +482,7 @@ btnAccept.addEventListener('click', () => {
     // Populate Ticket
     const genre = genreSelect.value === 'Other' ? genreOther.value : genreSelect.value;
     const snacks = document.getElementById('snacks').value || "None";
-    const dates = Array.from(document.querySelectorAll('.date-input')).map(i => i.value).filter(Boolean).join(', ');
+    const dates = Array.from(selectedDates).sort().join(', ');
     const time = timeInput.value;
 
     document.getElementById('ticket-genre').innerText = genre;

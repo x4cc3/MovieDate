@@ -94,14 +94,22 @@
 
             <!-- Step 3: Dates (Giant Ring Sector) -->
             <div class="step" data-step="4">
-                <h2>Add a date</h2>
-                <div class="field-group" id="date-container">
-                    <div class="date-row">
-                        <input type="date" class="input-control date-input" required>
-                        <button type="button" class="btn-icon remove-date" aria-label="Remove date">&times;</button>
+                <h2>Pick a date</h2>
+                <p class="subtitle">Just tap one or more days — no calendar wrestling.</p>
+
+                <div class="field-group">
+                    <div id="date-picks" class="date-picks" aria-label="Quick date picks"></div>
+
+                    <div id="selected-dates" class="selected-dates" aria-live="polite"></div>
+
+                    <div class="custom-date-row">
+                        <input type="date" id="custom-date-input" class="input-control" aria-label="Custom date">
+                        <button type="button" id="add-custom-date" class="btn-text">Add</button>
                     </div>
+
+                    <p id="date-error" class="error-banner hidden" role="alert">Pick at least one date to continue.</p>
                 </div>
-                <button type="button" id="add-date-btn" class="btn-text">+ Add another date</button>
+
                 <div class="nav-buttons">
                     <button type="button" class="btn-prev" data-prev>Back</button>
                     <button type="button" class="btn-next" data-next>Next</button>

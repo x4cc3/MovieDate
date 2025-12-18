@@ -255,10 +255,95 @@ select.input-control {
     letter-spacing: 0.3px;
 }
 
-.date-row {
+.date-picks {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+}
+
+.date-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-light);
+    padding: 10px 14px;
+    border-radius: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.date-chip:hover,
+.date-chip.selected {
+    background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 12px 30px rgba(199, 125, 255, 0.28);
+    transform: translateY(-2px);
+}
+
+.selected-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0 16px;
+}
+
+.selected-dates-empty {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.selected-date-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(199, 125, 255, 0.25);
+    background: rgba(199, 125, 255, 0.08);
+}
+
+.selected-date-text {
+    color: white;
+    font-size: 0.95rem;
+}
+
+.remove-selected-date {
+    background: none;
+    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    font-size: 1.1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-selected-date:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.custom-date-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.custom-date-row .input-control {
+    flex: 1;
+}
+
+@media (max-width: 420px) {
+    .custom-date-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
 .quick-picks {
