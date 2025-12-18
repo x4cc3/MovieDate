@@ -19,7 +19,7 @@ const config = {
     bgHex: 0x020205,
     galaxy: {
         // Reduced counts for smoother performance
-        count: isMobile ? 2000 : 6000,
+        count: isMobile ? 2000 : 8000,
         radius: 10,
         branches: 4,
         spin: 1.2,
