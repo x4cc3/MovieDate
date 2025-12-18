@@ -145,11 +145,11 @@ function buildQuickDatePicks() {
     if (!datePicks) return;
     datePicks.innerHTML = '';
 
-    // Next 7 days (including today)
+    // Next 7 days (starting tomorrow)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 1; i <= 7; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() + i);
         const iso = formatDateIso(d);
@@ -159,7 +159,7 @@ function buildQuickDatePicks() {
         btn.className = 'date-chip';
         btn.dataset.date = iso;
         btn.setAttribute('aria-pressed', 'false');
-        btn.textContent = i === 0 ? `Today (${formatDateNice(iso)})` : formatDateNice(iso);
+        btn.textContent = formatDateNice(iso);
 
         btn.addEventListener('click', () => {
             toggleDate(iso);
