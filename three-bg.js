@@ -18,7 +18,8 @@ const config = {
     reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     bgHex: 0x020205,
     galaxy: {
-        count: isMobile ? 8000 : 20000,
+        // Reduced counts for smoother performance
+        count: isMobile ? 4000 : 12000,
         radius: 10,
         branches: 4,
         spin: 1.2,
@@ -27,7 +28,7 @@ const config = {
         colorOutside: new THREE.Color('#4a90e2')
     },
     stars: {
-        count: isMobile ? 2000 : 5000
+        count: isMobile ? 1200 : 3000
     }
 };
 
